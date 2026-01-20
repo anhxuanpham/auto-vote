@@ -15,6 +15,7 @@ services:
     environment:
       - NODE_ENV=production
       - HEADLESS=true
+      - TZ=${TIMEZONE:-UTC}
 
     # Volume mounts for persistence
     volumes:
@@ -46,9 +47,6 @@ services:
       timeout: 30s
       retries: 3
       start_period: 10s
-
-    # Timezone settings
-    timezone: '${TIMEZONE:-UTC}'
 
     # Optional: Add network configuration
     # networks:
