@@ -69,6 +69,8 @@ FROM node:20-slim AS runtime
 # Install runtime Chrome dependencies only
 RUN apt-get update && apt-get install -y \
     ca-certificates \
+    wget \
+    gnupg \
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
