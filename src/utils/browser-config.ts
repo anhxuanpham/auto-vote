@@ -14,7 +14,17 @@ export function getLaunchConfig(config: BrowserConfig) {
     '--disable-features=TranslateUI',
     '--disable-web-security',
     '--disable-features=IsolateOrigins,site-per-process',
+    // Anti-detection flags
+    '--disable-blink-features=AutomationControlled',
+    '--disable-infobars',
+    '--window-size=1920,1080',
+    '--disable-features=site-per-process',
     `--user-agent=${config.userAgent}`,
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-renderer-backgrounding',
+    '--disable-field-trial-config',
+    '--disable-back-forward-cache',
   ];
 
   return {

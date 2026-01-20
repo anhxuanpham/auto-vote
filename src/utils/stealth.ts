@@ -11,7 +11,7 @@ export async function injectStealthScripts(page: Page): Promise<void> {
     // Hide webdriver property
     await page.evaluateOnNewDocument(() => {
       Object.defineProperty((globalThis as any).navigator, 'webdriver', {
-        get: () => undefined,
+        get: () => false,
       });
     });
 
@@ -32,6 +32,32 @@ export async function injectStealthScripts(page: Page): Promise<void> {
         parameters.name === 'notifications'
           ? Promise.resolve({ state: 'prompt' })
           : originalQuery(parameters);
+    });
+
+    // Hide automation indicator
+    await page.evaluateOnNewDocument(() => {
+      const originalCall = Function.prototype.call;
+      (Function.prototype as any).call = function () {
+        return originalCall.apply(this, arguments as any);
+      };
+      const originalApply = Function.prototype.apply;
+      (Function.prototype as any).apply = function () {
+        return originalApply.apply(this, arguments as any);
+      };
+    });
+
+    // Mock plugins
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty((globalThis as any).navigator, 'plugins', {
+        get: () => [1, 2, 3, 4, 5],
+      });
+    });
+
+    // Mock languages
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty((globalThis as any).navigator, 'languages', {
+        get: () => ['en-US', 'en'],
+      });
     });
 
     logger.debug('Stealth scripts injected');
