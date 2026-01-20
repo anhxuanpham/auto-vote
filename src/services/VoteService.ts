@@ -26,8 +26,8 @@ export class VoteService implements IVoteService {
   private config = loadConfig();
 
   // Retry configuration
-  private readonly MAX_RETRIES = 3;
-  private readonly RETRY_DELAYS = [5000, 10000, 15000]; // 5s, 10s, 15s
+  private readonly MAX_RETRIES = 4;
+  private readonly RETRY_DELAYS = [300000, 600000, 900000, 120000]; // 5m, 10m, 15m, 20m
 
   // Additional selectors for vote detection
   private readonly VOTE_SUCCESS_PATTERNS = [
