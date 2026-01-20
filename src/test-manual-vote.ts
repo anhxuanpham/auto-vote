@@ -57,7 +57,10 @@ async function testManualVote(): Promise<void> {
   try {
     // Launch browser
     logger.info('Launching browser...');
-    await browserService.launch({ headless: config.browser.headless });
+    await browserService.launch({
+      headless: config.browser.headless,
+      ...(config.browser.proxy && { proxy: config.browser.proxy }),
+    });
     logger.info('Browser launched successfully');
 
     // Perform vote

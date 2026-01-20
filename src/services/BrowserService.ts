@@ -34,11 +34,30 @@ export class BrowserService implements IBrowserService {
 
     this.logger.info('Launching browser...', { headless: options?.headless ?? true });
 
+    // Prepare launch args with proxy
+    const launchArgs: any = {
+      ...config,
+      headless: options?.headless ?? true,
+    };
+
+    // Add proxy if configured
+    if (options?.proxy?.server) {
+      launchArgs.args = [
+        ...(config.args || []),
+        `--proxy-server=${options.proxy.server}`,
+      ];
+      this.logger.info('Using proxy', { server: options.proxy.server });
+
+      // Set proxy auth if credentials provided
+      if (options.proxy.username && options.proxy.password) {
+        launchArgs.args.push(
+          `--proxy-auth=${options.proxy.username}:${options.proxy.password}`
+        );
+      }
+    }
+
     try {
-      this.browser = await puppeteer.launch({
-        ...config,
-        headless: options?.headless ?? true,
-      } as any);
+      this.browser = await puppeteer.launch(launchArgs);
       this.page = await this.browser.newPage();
 
       // Inject stealth scripts

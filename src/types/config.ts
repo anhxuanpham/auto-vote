@@ -41,6 +41,11 @@ export interface BrowserConfig {
   timeout: number;
   userAgent: string;
   viewport: ViewportConfig;
+  proxy?: {
+    server: string;
+    username?: string;
+    password?: string;
+  };
 }
 
 export interface ViewportConfig {

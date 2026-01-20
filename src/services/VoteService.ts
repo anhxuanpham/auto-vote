@@ -95,6 +95,7 @@ export class VoteService implements IVoteService {
       await this.browserService.launch({
         headless: this.config.browser.headless,
         timeout: this.config.browser.timeout,
+        ...(this.config.browser.proxy && { proxy: this.config.browser.proxy }),
       });
       const page = this.browserService.getPage();
       if (!page) {

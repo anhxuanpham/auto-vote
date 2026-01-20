@@ -5,6 +5,11 @@ export interface BrowserLaunchOptions {
   timeout?: number;
   userAgent?: string;
   viewport?: { width: number; height: number };
+  proxy?: {
+    server: string;
+    username?: string;
+    password?: string;
+  };
 }
 
 export interface IBrowserService {

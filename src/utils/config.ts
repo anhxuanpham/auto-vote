@@ -3,6 +3,28 @@ import { AppConfig } from '../types/config.js';
 
 dotenv.config({ path: './config/.env' });
 
+function parseProxyUrl(proxyUrl: string): { server: string; username?: string; password?: string } {
+  try {
+    // Format: username:password@host:port or host:port
+    const url = proxyUrl.includes('://') ? proxyUrl : `http://${proxyUrl}`;
+
+    if (url.includes('@')) {
+      // Has auth
+      const [, auth] = url.split('://');
+      const [credentials, server] = auth.split('@');
+      const [username, password] = credentials.split(':');
+      return { server, username, password };
+    } else {
+      // No auth
+      const [, server] = url.split('://');
+      return { server };
+    }
+  } catch (error) {
+    console.error('Failed to parse proxy URL:', error);
+    throw new Error(`Invalid PROXY_URL format: ${proxyUrl}`);
+  }
+}
+
 export function loadConfig(): AppConfig {
   // Support both formats: DISCORD_TOKENS (comma-separated) or DISCORD_TOKEN_1, DISCORD_TOKEN_2, etc.
   const tokens: string[] = [];
@@ -54,6 +76,9 @@ export function loadConfig(): AppConfig {
         width: parseInt(process.env.VIEWPORT_WIDTH || '1920', 10),
         height: parseInt(process.env.VIEWPORT_HEIGHT || '1080', 10),
       },
+      ...(process.env.PROXY_URL && {
+        proxy: parseProxyUrl(process.env.PROXY_URL),
+      }),
     },
     webhook: {
       url: process.env.DISCORD_WEBHOOK_URL || '',
