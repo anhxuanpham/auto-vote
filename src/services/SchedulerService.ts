@@ -6,6 +6,7 @@ import { AppConfig } from '../types/config.js';
 import { getLogger } from '../utils/logger.js';
 import { VoteResult } from '../types/vote.js';
 import { VoteStatus } from '../types/index.js';
+import { getValidTokens } from '../utils/token-validator.js';
 
 /**
  * SchedulerService - Manages automated voting schedule
@@ -106,12 +107,20 @@ export class SchedulerService {
       }
 
       // Get all tokens
-      const tokens = this.config.discord.tokens;
-      if (tokens.length === 0) {
+      const allTokens = this.config.discord.tokens;
+      if (allTokens.length === 0) {
         throw new Error('No Discord tokens configured');
       }
 
-      this.logger.info(`Executing parallel vote for ${tokens.length} accounts...`);
+      // Validate tokens before voting
+      this.logger.info(`Validating ${allTokens.length} tokens...`);
+      const tokens = await getValidTokens(allTokens);
+
+      if (tokens.length === 0) {
+        throw new Error('No valid tokens available - all tokens expired or invalid');
+      }
+
+      this.logger.info(`Executing parallel vote for ${tokens.length} accounts (${allTokens.length - tokens.length} invalid skipped)...`);
 
       // Run all votes in parallel
       const votePromises = tokens.map(async (token, index) => {

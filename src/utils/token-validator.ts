@@ -92,3 +92,31 @@ export async function validateTokenViaAPI(token: string): Promise<boolean> {
     return true;
   }
 }
+
+/**
+ * Validate multiple tokens and return valid ones
+ * Uses Discord API to check each token
+ * @param tokens - Array of Discord tokens
+ * @returns Promise<string[]> - Array of valid tokens
+ */
+export async function getValidTokens(tokens: string[]): Promise<string[]> {
+  const validTokens: string[] = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    const logger = getLogger();
+
+    logger.info(`Validating token #${i + 1}...`);
+
+    const isValid = await validateTokenViaAPI(token);
+    if (isValid) {
+      validTokens.push(token);
+    } else {
+      logger.warn(`Token #${i + 1} invalid or expired, skipping`);
+    }
+  }
+
+  const logger = getLogger();
+  logger.info(`Valid tokens: ${validTokens.length}/${tokens.length}`);
+  return validTokens;
+}
