@@ -47,18 +47,20 @@ export class BrowserService implements IBrowserService {
         `--proxy-server=${options.proxy.server}`,
       ];
       this.logger.info('Using proxy', { server: options.proxy.server });
-
-      // Set proxy auth if credentials provided
-      if (options.proxy.username && options.proxy.password) {
-        launchArgs.args.push(
-          `--proxy-auth=${options.proxy.username}:${options.proxy.password}`
-        );
-      }
     }
 
     try {
       this.browser = await puppeteer.launch(launchArgs);
       this.page = await this.browser.newPage();
+
+      // Set proxy authentication if credentials provided
+      if (options?.proxy?.username && options?.proxy?.password) {
+        await this.page.authenticate({
+          username: options.proxy.username,
+          password: options.proxy.password,
+        });
+        this.logger.info('Proxy authentication set');
+      }
 
       // Inject stealth scripts
       await injectStealthScripts(this.page);
