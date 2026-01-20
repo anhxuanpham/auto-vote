@@ -1,10 +1,14 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { IBrowserService, BrowserLaunchOptions } from './interfaces/IBrowserService.js';
 import { getLaunchConfig } from '../utils/browser-config.js';
 import { injectStealthScripts, humanDelay } from '../utils/stealth.js';
 import { detectCloudflareChallenge } from '../utils/cloudflare-detector.js';
 import { getLogger } from '../utils/logger.js';
 import { Browser, Page, HTTPResponse } from 'puppeteer';
+
+// Add stealth plugin
+puppeteer.use(StealthPlugin());
 
 /**
  * BrowserService - Manages Puppeteer browser lifecycle and interactions
