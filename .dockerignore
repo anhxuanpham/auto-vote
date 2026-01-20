@@ -1,0 +1,56 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build output
+dist
+build
+*.tsbuildinfo
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files
+.env
+.env.local
+.env.*.local
+config/.env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+docs
+plans
+reports
+
+# Tests
+test
+tests
+coverage
+.nyc_output
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data directories (will be mounted as volumes)
+data
+logs
+screenshots
+*.log
+
+# Misc
+.eslintrc.json
+.prettierrc
+.editorconfig

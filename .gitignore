@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+*.log
+logs/
+coverage/
+.DS_Store
+userData/
+*.tgz
+screenshots/
+
+# Docker
+config/docker.env
+data/

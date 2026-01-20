@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  topgg-vote:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: topgg-auto-vote:latest
+    container_name: topgg-auto-vote
+    restart: unless-stopped
+
+    # Environment variables
+    env_file:
+      - config/docker.env
+    environment:
+      - NODE_ENV=production
+      - HEADLESS=true
+
+    # Volume mounts for persistence
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./screenshots:/app/screenshots
+
+    # Resource limits (adjust based on your server)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+    # Logging configuration
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+    # Health check
+    healthcheck:
+      test: ['CMD', 'node', '-e', 'console.log("healthy")']
+      interval: 5m
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+
+    # Timezone settings
+    timezone: '${TIMEZONE:-UTC}'
+
+    # Optional: Add network configuration
+    # networks:
+    #   - vote-network
+
+# Optional: Define custom network
+# networks:
+#   vote-network:
+#     driver: bridge
+
+# Optional: Define volumes for data persistence
+# volumes:
+#   vote-data:
+#   vote-logs:
+#   vote-screenshots:
