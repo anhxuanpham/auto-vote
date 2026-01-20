@@ -45,7 +45,7 @@ COPY tsconfig.json ./
 COPY tsup.config.ts ./
 
 # Install production dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # ============================================
 # Stage 2: Build
