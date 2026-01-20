@@ -105,7 +105,7 @@ ENV CHROME_PATH=/usr/bin/google-chrome
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 
 # Create non-root user for security
-RUN useradd -m -u 1000 -s /bin/bash appuser
+RUN useradd -m -u 9999 -s /bin/bash appuser
 
 # Set working directory
 WORKDIR /app
