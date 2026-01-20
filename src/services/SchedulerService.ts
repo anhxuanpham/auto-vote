@@ -125,7 +125,7 @@ export class SchedulerService {
 
           // Create fresh vote service instance for each parallel execution
           const voteService = new VoteService();
-          const result = await voteService.vote(this.config.topgg.botId, token);
+          const result = await voteService.voteWithRetry(this.config.topgg.botId, token);
 
           // Send success/failure notification
           if (this.config.webhook.enabled) {

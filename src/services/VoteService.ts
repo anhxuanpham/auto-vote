@@ -25,6 +25,10 @@ export class VoteService implements IVoteService {
   private logger = getLogger();
   private config = loadConfig();
 
+  // Retry configuration
+  private readonly MAX_RETRIES = 3;
+  private readonly RETRY_DELAYS = [5000, 10000, 15000]; // 5s, 10s, 15s
+
   // Additional selectors for vote detection
   private readonly VOTE_SUCCESS_PATTERNS = [
     /successfully voted/i,
@@ -743,5 +747,56 @@ export class VoteService implements IVoteService {
    */
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Vote with retry logic (5s, 10s, 15s delays)
+   * Retries on transient errors, skips on rate-limit/cooldown
+   */
+  async voteWithRetry(botId: string, token: string): Promise<VoteResult> {
+    this.logger.info(`Starting vote with retry for bot ${botId}`);
+
+    let lastError = '';
+
+    for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
+      if (attempt > 0) {
+        const delaySec = this.RETRY_DELAYS[attempt - 1] / 1000;
+        this.logger.info(`Retry ${attempt}/${this.MAX_RETRIES - 1} after ${delaySec}s...`);
+        await this.sleep(this.RETRY_DELAYS[attempt - 1]);
+      }
+
+      const result = await this.vote(botId, token);
+
+      // Success - return immediately
+      if (result.success) {
+        if (attempt > 0) {
+          this.logger.info(`✓ Vote successful after ${attempt} retries`);
+        }
+        return result;
+      }
+
+      // Failed - check if should retry
+      lastError = result.error || 'Unknown error';
+      this.logger.warn(`Attempt ${attempt + 1} failed: ${lastError}`);
+
+      // Don't retry on rate limit or cooldown
+      if (result.status === VoteStatus.RATE_LIMITED || result.status === VoteStatus.COOLDOWN) {
+        this.logger.info('Non-retryable error, stopping retries');
+        return result;
+      }
+
+      // For other errors, continue retrying
+      this.logger.debug(`Will retry after ${this.RETRY_DELAYS[attempt] / 1000}s`);
+    }
+
+    // All retries failed
+    this.logger.error(`❌ Vote failed after ${this.MAX_RETRIES} attempts`);
+    return this.createResult(
+      botId,
+      token,
+      new Date(),
+      VoteStatus.FAILED,
+      lastError
+    );
   }
 }
